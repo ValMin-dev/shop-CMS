@@ -52,7 +52,14 @@ export class AuthService {
 		}
 	}
 
-	async logout(userId: string) {}
+	async logout(userId: string) {
+		const user = await this.userService.getById(userId)
+		if (!user) {
+			throw new Error('Користувач не знайдений')
+		}
+		this.removeRefreshTokenToResponse(userId as any)
+		return { message: 'Ви успішно вийшли з системи' }
+	}
 
 	private async validateUser(dto: AuthDto) {
 		const user = await this.userService.getByEmail(dto.email)

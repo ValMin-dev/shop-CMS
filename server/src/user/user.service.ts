@@ -7,6 +7,30 @@ import { PrismaService } from 'src/prisma.service'
 export class UserService {
 	constructor(private readonly prisma: PrismaService) {}
 
+	async toggleFavoriteProducts(userId: string, productId: string) {
+		const user = await this.getById(userId)
+		if (!user) {
+			throw new Error('Користувач не знайдений')
+		}
+		const isFavorite = user.favoriteProducts.some(
+			product => product.id === productId
+		)
+
+		await this.prisma.user.update({
+			where: { id: userId },
+			data: {
+				favoriteProducts: {
+					[isFavorite ? 'disconnect' : 'connect']: { id: productId }
+				}
+			}
+		})
+		return {
+			message: isFavorite
+				? 'Товар видалено з улюблених'
+				: 'Товар додано до улюблених'
+		}
+	}
+
 	async findAll() {
 		return this.prisma.user.findMany()
 	}
