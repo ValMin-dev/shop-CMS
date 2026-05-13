@@ -1,16 +1,19 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
 	Post,
 	Req,
 	Res,
+	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
-import type { Request, response } from 'express'
+import type { Request, Response } from 'express'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('auth')
 export class AuthController {
@@ -47,6 +50,27 @@ export class AuthController {
 		await this.authService.logout(userId)
 		this.authService.removeRefreshTokenToResponse(res as any)
 		return { message: 'Ви успішно вийшли з системи' }
+	}
+
+	@Get('google')
+	@UseGuards(AuthGuard('google'))
+	async googleAuth(@Req() req: Request) {
+		return this.authService.validateOAuthLogin(req)
+	}
+
+	@Get('google/callback')
+	@UseGuards(AuthGuard('google'))
+	async googleAuthCallBack(
+		@Req() req: any,
+		@Res({ passthrough: true }) res: Response
+	) {
+		const { refreshToken, ...response } =
+			await this.authService.validateOAuthLogin(req)
+		this.authService.addRefreshTokenToResponse(res as any, refreshToken)
+
+		return res.redirect(
+			`${process.env.CLIENT_URL}/dashboard?accessToken=${response.accessToken}`
+		)
 	}
 
 	@UsePipes(new ValidationPipe())

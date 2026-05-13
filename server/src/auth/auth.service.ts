@@ -5,6 +5,7 @@ import { UserService } from 'src/user/user.service'
 import { AuthDto } from './dto/auth.dto'
 import { ConfigService } from '@nestjs/config'
 import { Response } from 'express'
+import { verify, hash } from 'argon2'
 
 @Injectable()
 export class AuthService {
@@ -59,7 +60,7 @@ export class AuthService {
 		if (!user) {
 			throw new Error('Користувач не знайдений')
 		}
-		if (user.password !== dto.password) {
+		if (!user.password || !(await verify(user.password, dto.password))) {
 			throw new Error('Невірний пошта або пароль')
 		}
 
@@ -73,7 +74,7 @@ export class AuthService {
 				data: {
 					email: req.user.email,
 					name: req.user.firstName + ' ' + req.user.lastName,
-					password: Math.random().toString(36).slice(-8)
+					password: await hash(req.user.id + process.env.JWT_SECRET)
 				},
 				include: {
 					stores: true,
