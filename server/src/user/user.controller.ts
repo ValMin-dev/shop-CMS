@@ -24,7 +24,7 @@ export class UserController {
 	}
 
 	@Auth()
-	@Patch('profile/favorites/:productId')
+	@Patch('/profile/favorites/:productId')
 	async toggleFavoriteProducts(
 		@CurrentUser('id') userId: string,
 		@Param('productId') productId: string
