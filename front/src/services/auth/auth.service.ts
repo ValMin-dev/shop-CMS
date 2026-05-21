@@ -1,7 +1,6 @@
-import { IAuthForm } from '@/src/shared/types/auth.interface'
-import { IAuthResponse } from '../../shared/types/auth.interface'
-import { API_URL } from '@/src/config/api.config'
-import { axiosClassic } from '@/src/api/api.interceptors'
+import { axiosClassic } from '@/api/api.interceptors'
+import { API_URL } from '@/config/api.config'
+import { IAuthForm, IAuthResponse } from '../../shared/types/auth.interface'
 import { removeTokenStorage, saveTokenStorage } from './auth-token-service'
 
 class AuthService {

@@ -1,7 +1,7 @@
 import axios, { CreateAxiosDefaults } from 'axios'
 import { errorCatch, getContentType } from './api.helper'
 import { SERVER_URL } from '../config/api.config'
-import { authService } from '../services/auth/auth.service'
+import AuthService from '../services/auth/auth.service'
 import {
 	getAccessToken,
 	removeTokenStorage
@@ -33,7 +33,7 @@ axiosAuth.interceptors.response.use(
 		) {
 			originalRequest._isRetry = true
 			try {
-				await authService.getNewTokens()
+				await AuthService.getNewTokens()
 				return axiosAuth.request(originalRequest)
 			} catch (err) {
 				if (errorCatch(err) === 'jwt expired') removeTokenStorage()
